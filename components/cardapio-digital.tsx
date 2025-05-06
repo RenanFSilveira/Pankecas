@@ -322,7 +322,6 @@ export function CardapioDigital() {
                 >
                   {menuData.filter((p) => p.category === categoria).length > 0 && (
                     <>
-                      {/* Aplicando centralização responsiva aqui também para consistência, se desejado */}
                       <h1 className="text-2xl font-bold text-[#8B4513] mb-4 font-['BabyKruffy'] text-center md:text-left">{categoryNames[categoria]}</h1>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {produtosFiltrados 
@@ -363,8 +362,8 @@ export function CardapioDigital() {
         )}
 
         {carrinhoAberto && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-60 flex justify-end">
-            <div className="bg-white w-full max-w-md h-full flex flex-col shadow-xl">
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-[100] flex justify-end">
+            <div className="bg-white w-3/4 md:w-full md:max-w-md h-full flex flex-col shadow-xl">
               <div className="p-4 border-b flex justify-between items-center">
                 <h2 className="text-xl font-bold text-[#8B4513]">Seu Carrinho</h2>
                 <Button variant="ghost" size="icon" onClick={() => setCarrinhoAberto(false)}>
@@ -381,46 +380,53 @@ export function CardapioDigital() {
               ) : (
                 <ScrollArea className="flex-1 p-4">
                   {itensCarrinho.map((item) => (
-                    <div key={item.produto.id} className="flex items-center py-3 border-b last:border-b-0">
-                      <div className="w-16 h-16 mr-3 rounded overflow-hidden flex-shrink-0">
-                        <Image
-                          src={item.produto.image || "/placeholder.svg"}
-                          alt={item.produto.name}
-                          width={64}
-                          height={64}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-[#8B4513] truncate">{item.produto.name}</h3>
-                        <p className="text-sm text-gray-500">R$ {item.produto.price.toFixed(2)}</p>
-                      </div>
-                      <div className="flex items-center ml-3 flex-shrink-0">
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="h-7 w-7 rounded-full p-0"
-                          onClick={() => alterarQuantidade(item.produto.id, "diminuir")}
-                        >
-                          <Minus className="h-3.5 w-3.5" />
-                        </Button>
-                        <span className="mx-2 w-5 text-center text-sm">{item.quantidade}</span>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="h-7 w-7 rounded-full p-0"
-                          onClick={() => alterarQuantidade(item.produto.id, "aumentar")}
-                        >
-                          <Plus className="h-3.5 w-3.5" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-7 w-7 ml-2 text-red-500 hover:text-red-700 p-0"
-                          onClick={() => removerItem(item.produto.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                    <div key={item.produto.id} className="flex items-start gap-3 p-3 border-b border-gray-200 last:border-b-0">
+                      <Image
+                        src={item.produto.image || "/placeholder.svg"}
+                        alt={item.produto.name}
+                        width={60} 
+                        height={60}
+                        className="rounded object-cover flex-shrink-0 mt-1"
+                      />
+                      <div className="flex-1 flex flex-col">
+                        <div className="flex justify-between items-start mb-1">
+                          <h3 className="font-semibold text-[#8B4513] text-sm leading-tight mr-2">{item.produto.name}</h3>
+                          <p className="text-sm font-semibold text-[#8B4513] whitespace-nowrap">
+                            R$ {(item.produto.price * item.quantidade).toFixed(2)}
+                          </p>
+                        </div>
+                        <p className="text-xs text-gray-500 mb-1.5">
+                          Unitário: R$ {item.produto.price.toFixed(2)}
+                        </p>
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center gap-1.5"> 
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="h-7 w-7 border-gray-300 hover:bg-gray-100"
+                              onClick={() => alterarQuantidade(item.produto.id, "diminuir")}
+                            >
+                              <Minus className="h-4 w-4 text-gray-700" />
+                            </Button>
+                            <span className="text-sm w-6 text-center font-medium text-gray-800">{item.quantidade}</span>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="h-7 w-7 border-gray-300 hover:bg-gray-100"
+                              onClick={() => alterarQuantidade(item.produto.id, "aumentar")}
+                            >
+                              <Plus className="h-4 w-4 text-gray-700" />
+                            </Button>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-red-500 hover:text-red-600 hover:bg-red-50 h-7 w-7"
+                            onClick={() => removerItem(item.produto.id)}
+                          >
+                            <Trash2 className="h-4 w-4" /> 
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -446,7 +452,7 @@ export function CardapioDigital() {
         )}
 
         {mostrarFormulario && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-70 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-[110] flex items-center justify-center p-4">
             <Card className="w-full max-w-lg bg-white">
               <div className="p-6">
                 <div className="flex justify-between items-center mb-6">
