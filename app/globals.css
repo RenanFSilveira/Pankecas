@@ -103,7 +103,7 @@
   }
 
   /* Apply BabyKruffy to headings */
-  h1, h3, h5, h6 {
+  h1, h5, h6 {
     font-family: 'BabyKruffy', sans-serif; /* Added BabyKruffy and fallback */
     letter-spacing: 3px;
   }
