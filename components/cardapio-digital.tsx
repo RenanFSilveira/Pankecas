@@ -127,7 +127,7 @@ export function CardapioDigital() {
     })
     mensagem += `\n*Total:* R$ ${calcularTotal().toFixed(2)}`
     const mensagemCodificada = encodeURIComponent(mensagem)
-    const numeroWhatsApp = "5511999999999"
+    const numeroWhatsApp = "5527999999154"
     const urlWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${mensagemCodificada}`
     window.open(urlWhatsApp, "_blank")
   }
