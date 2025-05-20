@@ -19,7 +19,7 @@ export const menuData: MenuItem[] = [
     name: "Mexicana",
     description:
       "Se gosta realmente de sabor picante, esta é a sua panqueca. Elaborada com o tempero para Taco, páprica picante e pimenta calabresa em flocos este recheio de carne moída ao estilo mexicano pega.",
-    price: 30.0,
+    price: 34.0,
     image: "/Vermelha.webp",
     category: "molho_tomate",
   },
