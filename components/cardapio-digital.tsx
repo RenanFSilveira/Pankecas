@@ -85,7 +85,7 @@ export function CardapioDigital() {
           ],
         },
       });
-      
+    }
 
     setItensCarrinho((itens) => {
       const itemExistente = itens.find((item) => item.produto.id === produto.id)
@@ -192,7 +192,7 @@ export function CardapioDigital() {
         },
       });
     }
-    
+
     let mensagem = `*Novo Pedido - Pankeca's*\n\n`
     mensagem += `*Cliente:* ${nome}\n`
     mensagem += `*Telefone:* ${telefone}\n`
@@ -399,214 +399,202 @@ export function CardapioDigital() {
 
         {categoriaAtiva !== "todos" && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {categoriesList
-              .filter((cat) => cat !== "todos")
-              .map((categoria) => (
-                <div
-                  key={categoria}
-                  ref={(el) => {
-                    secoesCategorias.current[categoria] = el;
-                  }}
-                  data-categoria={categoria} 
-                  className={cn("col-span-full", categoriaAtiva !== categoria && "hidden")} 
-                  id={`section-${categoria}`}
-                >
-                  {menuData.filter((p) => p.category === categoria).length > 0 && (
-                    <>
-                      <h1 className="text-2xl font-bold text-[#8B4513] mb-4 font-['BabyKruffy'] text-center md:text-left">{categoryNames[categoria]}</h1>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {produtosFiltrados 
-                          .map((produto) => (
-                            <Card key={produto.id} className="overflow-hidden flex flex-col h-full">
-                              <div className="aspect-video w-full overflow-hidden">
-                                <Image
-                                  src={produto.image || "/placeholder.svg"}
-                                  alt={produto.name}
-                                  width={400}
-                                  height={300}
-                                  className="w-full h-full object-cover"
-                                />
-                              </div>
-                              <div className="p-4 flex flex-col flex-1">
-                                <h2 className="text-xl font-bold text-[#8B4513] mb-2">{produto.name}</h2>
-                                <p className="text-sm text-gray-600 mb-4 flex-1">{produto.description}</p>
-                                <div className="flex justify-between items-center mt-auto">
-                                  <span className="text-lg font-bold text-[#8B4513]">
-                                    R$ {produto.price.toFixed(2)}
-                                  </span>
-                                  <Button
-                                    onClick={() => adicionarAoCarrinho(produto)}
-                                    className="bg-[#8B4513] hover:bg-[#6B3100]"
-                                  >
-                                    + Adicionar
-                                  </Button>
-                                </div>
-                              </div>
-                            </Card>
-                          ))}
-                      </div>
-                    </>
-                  )}
+            {produtosFiltrados.map((produto) => (
+              <Card key={produto.id} className="overflow-hidden flex flex-col h-full">
+                <div className="aspect-video w-full overflow-hidden">
+                  <Image
+                    src={produto.image || "/placeholder.svg"}
+                    alt={produto.name}
+                    width={400}
+                    height={300}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
-              ))}
-          </div>
-        )}
-
-        {carrinhoAberto && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-[100] flex justify-end">
-            <div className="bg-white w-3/4 md:w-full md:max-w-md h-full flex flex-col shadow-xl">
-              <div className="p-4 border-b flex justify-between items-center">
-                <h2 className="text-xl font-bold text-[#8B4513]">Seu Carrinho</h2>
-                <Button variant="ghost" size="icon" onClick={() => setCarrinhoAberto(false)}>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                </Button>
-              </div>
-
-              {itensCarrinho.length === 0 ? (
-                <div className="flex-1 flex flex-col items-center justify-center p-4">
-                  <ShoppingCart className="h-16 w-16 text-gray-300 mb-4" />
-                  <p className="text-gray-500 text-lg">Seu carrinho está vazio.</p>
-                  <p className="text-sm text-gray-400 mt-1">Adicione itens do cardápio!</p>
-                </div>
-              ) : (
-                <ScrollArea className="flex-1 p-4">
-                  {itensCarrinho.map((item) => (
-                    <div key={item.produto.id} className="flex items-start gap-3 p-3 border-b border-gray-200 last:border-b-0">
-                      <Image
-                        src={item.produto.image || "/placeholder.svg"}
-                        alt={item.produto.name}
-                        width={60} 
-                        height={60}
-                        className="rounded object-cover flex-shrink-0 mt-1"
-                      />
-                      <div className="flex-1 flex flex-col">
-                        <div className="flex justify-between items-start mb-1">
-                          <h3 className="font-semibold text-[#8B4513] text-sm leading-tight mr-2">{item.produto.name}</h3>
-                          <p className="text-sm font-semibold text-[#8B4513] whitespace-nowrap">
-                            R$ {(item.produto.price * item.quantidade).toFixed(2)}
-                          </p>
-                        </div>
-                        <p className="text-xs text-gray-500 mb-1.5">
-                          Unitário: R$ {item.produto.price.toFixed(2)}
-                        </p>
-                        <div className="flex justify-between items-center">
-                          <div className="flex items-center gap-1.5"> 
-                            <Button
-                              variant="outline"
-                              size="icon"
-                              className="h-7 w-7 border-gray-300 hover:bg-gray-100"
-                              onClick={() => alterarQuantidade(item.produto.id, "diminuir")}
-                            >
-                              <Minus className="h-4 w-4 text-gray-700" />
-                            </Button>
-                            <span className="text-sm w-6 text-center font-medium text-gray-800">{item.quantidade}</span>
-                            <Button
-                              variant="outline"
-                              size="icon"
-                              className="h-7 w-7 border-gray-300 hover:bg-gray-100"
-                              onClick={() => alterarQuantidade(item.produto.id, "aumentar")}
-                            >
-                              <Plus className="h-4 w-4 text-gray-700" />
-                            </Button>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="text-red-500 hover:text-red-600 hover:bg-red-50 h-7 w-7"
-                            onClick={() => removerItem(item.produto.id)}
-                          >
-                            <Trash2 className="h-4 w-4" /> 
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </ScrollArea>
-              )}
-
-              {itensCarrinho.length > 0 && (
-                <div className="p-4 border-t">
-                  <div className="flex justify-between items-center mb-4">
-                    <span className="text-lg font-semibold text-gray-700">Total:</span>
-                    <span className="text-xl font-bold text-[#8B4513]">R$ {calcularTotal().toFixed(2)}</span>
-                  </div>
-                  <Button
-                    className="w-full bg-[#8B4513] hover:bg-[#6B3100] text-white py-3 text-base"
-                    onClick={() => setMostrarFormulario(true)}
-                  >
-                    Finalizar Pedido
-                  </Button>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {mostrarFormulario && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-[110] flex items-center justify-center p-4">
-            <Card className="w-full max-w-lg bg-white">
-              <div className="p-6">
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-2xl font-bold text-[#8B4513]">Detalhes do Pedido</h2>
-                  <Button variant="ghost" size="icon" onClick={() => setMostrarFormulario(false)}>
-                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                  </Button>
-                </div>
-                <form onSubmit={(e) => { e.preventDefault(); enviarPedido(); }}>
-                  <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="nome" className="text-sm font-medium text-gray-700">Nome Completo</Label>
-                      <Input id="nome" value={formulario.nome} onChange={(e) => atualizarFormulario("nome", e.target.value)} required className="mt-1" />
-                    </div>
-                    <div>
-                      <Label htmlFor="telefone" className="text-sm font-medium text-gray-700">Telefone (WhatsApp)</Label>
-                      <Input id="telefone" type="tel" value={formulario.telefone} onChange={(e) => atualizarFormulario("telefone", e.target.value)} required className="mt-1" />
-                    </div>
-                    <div className="flex items-center space-x-2 pt-2">
-                      <Checkbox id="retirada" checked={formulario.retiradaNaLoja} onCheckedChange={(checked) => atualizarFormulario("retiradaNaLoja", checked)} />
-                      <Label htmlFor="retirada" className="text-sm font-medium text-gray-700">Retirar na Loja</Label>
-                    </div>
-                    {!formulario.retiradaNaLoja && (
-                      <>
-                        <div>
-                          <Label htmlFor="endereco" className="text-sm font-medium text-gray-700">Endereço para Entrega</Label>
-                          <Input id="endereco" value={formulario.endereco} onChange={(e) => atualizarFormulario("endereco", e.target.value)} required={!formulario.retiradaNaLoja} className="mt-1" />
-                        </div>
-                        <div>
-                          <Label htmlFor="complemento" className="text-sm font-medium text-gray-700">Complemento (Opcional)</Label>
-                          <Input id="complemento" value={formulario.complemento} onChange={(e) => atualizarFormulario("complemento", e.target.value)} className="mt-1" />
-                        </div>
-                      </>
-                    )}
-                    <div className="pt-2">
-                      <Label className="text-sm font-medium text-gray-700">Forma de Pagamento</Label>
-                      <RadioGroup defaultValue="dinheiro" value={formulario.formaPagamento} onValueChange={(value) => atualizarFormulario("formaPagamento", value as any)} className="mt-2 grid grid-cols-3 gap-4">
-                        {["dinheiro", "pix", "cartao"].map((option) => (
-                          <Label key={option} htmlFor={`payment-${option}`} className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary">
-                            <RadioGroupItem value={option} id={`payment-${option}`} className="sr-only" />
-                            <span className="text-sm font-medium uppercase">{option}</span>
-                          </Label>
-                        ))}
-                      </RadioGroup>
-                    </div>
-                  </div>
-                  <div className="mt-8 flex justify-end">
-                    <Button type="submit" className="bg-[#8B4513] hover:bg-[#6B3100] text-white px-6 py-2.5 text-base">
-                      Enviar Pedido via WhatsApp
+                <div className="p-4 flex flex-col flex-1">
+                  <h2 className="text-xl font-bold text-[#8B4513] mb-2">{produto.name}</h2>
+                  <p className="text-sm text-gray-600 mb-4 flex-1">{produto.description}</p>
+                  <div className="flex justify-between items-center mt-auto">
+                    <span className="text-lg font-bold text-[#8B4513]">R$ {produto.price.toFixed(2)}</span>
+                    <Button onClick={() => adicionarAoCarrinho(produto)} className="bg-[#8B4513] hover:bg-[#6B3100]">
+                      + Adicionar
                     </Button>
                   </div>
-                </form>
-              </div>
-            </Card>
+                </div>
+              </Card>
+            ))}
           </div>
         )}
       </div>
 
-      <footer className="bg-[#8B4513] text-white text-center p-6 mt-auto">
-        <p>&copy; {new Date().getFullYear()} Pankeca's. Todos os direitos reservados.</p>
-        <p className="text-sm">Feito com ❤️ por Pankeca's</p>
-      </footer>
+      {carrinhoAberto && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-end">
+          <Card className="w-full max-w-md h-full bg-white flex flex-col">
+            <div className="p-4 border-b flex justify-between items-center">
+              <h2 className="text-xl font-bold text-[#8B4513]">Seu Carrinho</h2>
+              <Button variant="ghost" size="icon" onClick={() => setCarrinhoAberto(false)}>
+                X
+              </Button>
+            </div>
+            <ScrollArea className="flex-1 p-4">
+              {itensCarrinho.length === 0 ? (
+                <p className="text-gray-600">Seu carrinho está vazio.</p>
+              ) : (
+                itensCarrinho.map((item) => (
+                  <div key={item.produto.id} className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-2">
+                      <Image
+                        src={item.produto.image || "/placeholder.svg"}
+                        alt={item.produto.name}
+                        width={50}
+                        height={50}
+                        className="rounded-md object-cover"
+                      />
+                      <div>
+                        <h3 className="font-medium text-[#8B4513]">{item.produto.name}</h3>
+                        <p className="text-sm text-gray-600">Unitário: R$ {item.produto.price.toFixed(2)}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-6 w-6 text-[#8B4513] border-[#8B4513]"
+                        onClick={() => alterarQuantidade(item.produto.id, "diminuir")}
+                      >
+                        <Minus className="h-4 w-4" />
+                      </Button>
+                      <span className="text-sm font-medium text-[#8B4513]">{item.quantidade}</span>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-6 w-6 text-[#8B4513] border-[#8B4513]"
+                        onClick={() => alterarQuantidade(item.produto.id, "aumentar")}
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-red-500 hover:text-red-700"
+                        onClick={() => removerItem(item.produto.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </ScrollArea>
+            <div className="p-4 border-t">
+              <div className="flex justify-between items-center mb-4">
+                <span className="text-lg font-bold text-[#8B4513]">Total:</span>
+                <span className="text-lg font-bold text-[#8B4513]">R$ {calcularTotal().toFixed(2)}</span>
+              </div>
+              <Button
+                className="w-full bg-[#8B4513] hover:bg-[#6B3100]"
+                onClick={() => setMostrarFormulario(true)}
+                disabled={itensCarrinho.length === 0}
+              >
+                Finalizar Pedido
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {mostrarFormulario && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <Card className="w-full max-w-md p-6 bg-white">
+            <h2 className="text-2xl font-bold text-[#8B4513] mb-4">Detalhes do Pedido</h2>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault()
+                enviarPedido()
+              }}
+            >
+              <div className="mb-4">
+                <Label htmlFor="nome">Nome Completo</Label>
+                <Input
+                  id="nome"
+                  value={formulario.nome}
+                  onChange={(e) => atualizarFormulario("nome", e.target.value)}
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <Label htmlFor="telefone">Telefone (WhatsApp)</Label>
+                <Input
+                  id="telefone"
+                  value={formulario.telefone}
+                  onChange={(e) => atualizarFormulario("telefone", e.target.value)}
+                  required
+                />
+              </div>
+              <div className="mb-4 flex items-center space-x-2">
+                <Checkbox
+                  id="retirarNaLoja"
+                  checked={formulario.retiradaNaLoja}
+                  onCheckedChange={(checked) => {
+                    atualizarFormulario("retiradaNaLoja", checked)
+                    if (checked) {
+                      atualizarFormulario("endereco", "")
+                      atualizarFormulario("complemento", "")
+                    }
+                  }}
+                />
+                <Label htmlFor="retirarNaLoja">Retirar na Loja</Label>
+              </div>
+              {!formulario.retiradaNaLoja && (
+                <div className="mb-4">
+                  <Label htmlFor="endereco">Endereço para Entrega</Label>
+                  <Input
+                    id="endereco"
+                    value={formulario.endereco}
+                    onChange={(e) => atualizarFormulario("endereco", e.target.value)}
+                    required={!formulario.retiradaNaLoja}
+                  />
+                </div>
+              )}
+              <div className="mb-4">
+                <Label htmlFor="complemento">Complemento (Opcional)</Label>
+                <Input
+                  id="complemento"
+                  value={formulario.complemento}
+                  onChange={(e) => atualizarFormulario("complemento", e.target.value)}
+                />
+              </div>
+              <div className="mb-4">
+                <Label>Forma de Pagamento</Label>
+                <RadioGroup
+                  value={formulario.formaPagamento}
+                  onValueChange={(value: "dinheiro" | "pix" | "cartao") =>
+                    atualizarFormulario("formaPagamento", value)
+                  }
+                  className="flex space-x-4"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem id="dinheiro" value="dinheiro" />
+                    <Label htmlFor="dinheiro">dinheiro</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem id="pix" value="pix" />
+                    <Label htmlFor="pix">pix</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem id="cartao" value="cartao" />
+                    <Label htmlFor="cartao">cartao</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+              <Button type="submit" className="w-full bg-[#8B4513] hover:bg-[#6B3100]">
+                Enviar Pedido via WhatsApp
+              </Button>
+            </form>
+          </Card>
+        </div>
+      )}
     </div>
   )
 }
+
 
