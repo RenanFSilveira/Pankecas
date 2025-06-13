@@ -86,13 +86,6 @@ export function CardapioDigital() {
         },
       });
       
-      // Log para debug (remover em produção)
-      console.log("GTM: add_to_cart", {
-        produto: produto.name,
-        preco: produto.price,
-        categoria: produto.category
-      });
-    }
 
     setItensCarrinho((itens) => {
       const itemExistente = itens.find((item) => item.produto.id === produto.id)
@@ -198,19 +191,6 @@ export function CardapioDigital() {
           tipo_entrega: retiradaNaLoja ? "retirada" : "entrega",
         },
       });
-      
-      // Log para debug (remover em produção)
-      console.log("GTM: purchase com customer_info padronizado", {
-        transactionId,
-        total: calcularTotal(),
-        itens: itensCarrinho.length,
-        primeiroNome,
-        ultimoNome,
-        telefoneFormatado: formatarTelefone(telefone),
-        pagamento: formaPagamento,
-        entrega: retiradaNaLoja ? "retirada" : "entrega"
-      });
-    }
 
     let mensagem = `*Novo Pedido - Pankeca's*\n\n`
     mensagem += `*Cliente:* ${nome}\n`
