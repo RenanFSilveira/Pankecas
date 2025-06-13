@@ -13,6 +13,13 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
 import { menuData, categoryNames, categoriesList, type MenuItem } from "@/lib/menu-data"
 
+// Declaração de tipos para GTM/GA4
+declare global {
+  interface Window {
+    dataLayer: any[];
+  }
+}
+
 type ItemCarrinho = {
   produto: MenuItem
   quantidade: number
@@ -59,6 +66,34 @@ export function CardapioDigital() {
   }, [])
 
   const adicionarAoCarrinho = (produto: MenuItem) => {
+    // Tracking GTM/GA4 - Evento add_to_cart
+    if (typeof window !== 'undefined') {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: "add_to_cart",
+        ecommerce: {
+          currency: "BRL",
+          value: produto.price,
+          items: [
+            {
+              item_id: produto.id.toString(),
+              item_name: produto.name,
+              item_category: produto.category,
+              price: produto.price,
+              quantity: 1,
+            },
+          ],
+        },
+      });
+      
+      // Log para debug (remover em produção)
+      console.log("GTM: add_to_cart", {
+        produto: produto.name,
+        preco: produto.price,
+        categoria: produto.category
+      });
+    }
+
     setItensCarrinho((itens) => {
       const itemExistente = itens.find((item) => item.produto.id === produto.id)
       if (itemExistente) {
@@ -107,6 +142,50 @@ export function CardapioDigital() {
       alert("Por favor, preencha todos os campos obrigatórios.")
       return
     }
+
+    // Tracking GTM/GA4 - Evento purchase com customer_info
+    if (typeof window !== 'undefined') {
+      const transactionId = `T_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: "purchase",
+        ecommerce: {
+          transaction_id: transactionId,
+          affiliation: "Pankeca's - Cardápio Digital",
+          value: calcularTotal(),
+          tax: 0,
+          shipping: 0,
+          currency: "BRL",
+          items: itensCarrinho.map(item => ({
+            item_id: item.produto.id.toString(),
+            item_name: item.produto.name,
+            item_category: item.produto.category,
+            price: item.produto.price,
+            quantity: item.quantidade,
+          })),
+        },
+        customer_info: {
+          nome,
+          telefone,
+          endereco: retiradaNaLoja ? "Retirar na loja" : endereco,
+          complemento,
+          forma_pagamento: formaPagamento,
+          tipo_entrega: retiradaNaLoja ? "retirada" : "entrega",
+        },
+      });
+      
+      // Log para debug (remover em produção)
+      console.log("GTM: purchase com customer_info", {
+        transactionId,
+        total: calcularTotal(),
+        itens: itensCarrinho.length,
+        cliente: nome,
+        pagamento: formaPagamento,
+        entrega: retiradaNaLoja ? "retirada" : "entrega"
+      });
+    }
+
     let mensagem = `*Novo Pedido - Pankeca's*\n\n`
     mensagem += `*Cliente:* ${nome}\n`
     mensagem += `*Telefone:* ${telefone}\n`
@@ -130,6 +209,11 @@ export function CardapioDigital() {
     const numeroWhatsApp = "5527999999154"
     const urlWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${mensagemCodificada}`
     window.open(urlWhatsApp, "_blank")
+
+    // Opcional: Limpar carrinho após envio
+    // setItensCarrinho([])
+    // setCarrinhoAberto(false)
+    // setMostrarFormulario(false)
   }
 
   useEffect(() => {
