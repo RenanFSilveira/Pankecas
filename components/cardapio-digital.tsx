@@ -143,9 +143,32 @@ export function CardapioDigital() {
       return
     }
 
-    // Tracking GTM/GA4 - Evento purchase com customer_info
+    // Tracking GTM/GA4 - Evento purchase com customer_info padronizado
     if (typeof window !== 'undefined') {
       const transactionId = `T_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
+      // Função para formatar telefone com código internacional (+55)
+      const formatarTelefone = (telefone: string) => {
+        // Remove tudo que não for número
+        const apenasNumeros = telefone.replace(/\D/g, "");
+        
+        // Se já tiver o 55 no início, retorna como está
+        if (apenasNumeros.startsWith("55")) {
+          return apenasNumeros;
+        }
+
+        // Se tiver 10 ou mais dígitos (DDD + número), adiciona o 55 na frente
+        if (apenasNumeros.length >= 10) {
+          return `55${apenasNumeros}`;
+        }
+
+        // Fallback (caso venha algo inválido)
+        return apenasNumeros;
+      };
+
+      // Separar primeiro nome e último nome
+      const [primeiroNome, ...resto] = nome.trim().split(" ");
+      const ultimoNome = resto.join(" ");
       
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push({
@@ -166,8 +189,9 @@ export function CardapioDigital() {
           })),
         },
         customer_info: {
-          nome,
-          telefone,
+          primeiro_nome: primeiroNome,
+          ultimo_nome: ultimoNome,
+          telefone: formatarTelefone(telefone),
           endereco: retiradaNaLoja ? "Retirar na loja" : endereco,
           complemento,
           forma_pagamento: formaPagamento,
@@ -176,11 +200,13 @@ export function CardapioDigital() {
       });
       
       // Log para debug (remover em produção)
-      console.log("GTM: purchase com customer_info", {
+      console.log("GTM: purchase com customer_info padronizado", {
         transactionId,
         total: calcularTotal(),
         itens: itensCarrinho.length,
-        cliente: nome,
+        primeiroNome,
+        ultimoNome,
+        telefoneFormatado: formatarTelefone(telefone),
         pagamento: formaPagamento,
         entrega: retiradaNaLoja ? "retirada" : "entrega"
       });
