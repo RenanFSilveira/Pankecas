@@ -191,7 +191,8 @@ export function CardapioDigital() {
           tipo_entrega: retiradaNaLoja ? "retirada" : "entrega",
         },
       });
-
+    }
+    
     let mensagem = `*Novo Pedido - Pankeca's*\n\n`
     mensagem += `*Cliente:* ${nome}\n`
     mensagem += `*Telefone:* ${telefone}\n`
