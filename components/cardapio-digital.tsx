@@ -131,6 +131,7 @@ export function CardapioDigital() {
   }
 
   const enviarPedido = () => {
+    const eventId = `evt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     const { nome, telefone, endereco, complemento, retiradaNaLoja, formaPagamento } = formulario
     if (!nome || !telefone || (!retiradaNaLoja && !endereco)) {
       alert("Por favor, preencha todos os campos obrigatórios.")
@@ -140,8 +141,6 @@ export function CardapioDigital() {
     // Tracking GTM/GA4 - Evento purchase com customer_info padronizado
     if (typeof window !== 'undefined') {
       const transactionId = `T_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      const eventId = `evt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`; // Novo event_id para deduplicação
-
       
       // Função para formatar telefone com código internacional (+55)
       const formatarTelefone = (telefone: string) => {
@@ -183,6 +182,7 @@ export function CardapioDigital() {
             price: item.produto.price,
             quantity: item.quantidade,
           })),
+          event_id: eventId,
         },
         customer_info: {
           primeiro_nome: primeiroNome,
@@ -197,7 +197,6 @@ export function CardapioDigital() {
 
       // --- INÍCIO DA MODIFICAÇÃO PARA META PIXEL --- 
       // Dispara o evento de compra para o Meta Pixel
-      
       if (window.fbq) {
         window.fbq('track', 'Purchase', {
           value: calcularTotal(),
@@ -208,10 +207,51 @@ export function CardapioDigital() {
             quantity: item.quantidade,
             item_price: item.produto.price,
           })),
-          event_id: eventId, // <-- Adicione esta linha
+          event_id: eventId,
+          // Você pode adicionar outros parâmetros do customer_info aqui se desejar
+          // Ex: external_id: transactionId, // Para deduplicação se usar CAPI
+          // email: 'email_do_cliente@exemplo.com', // Se coletar email
+          // phone_number: formatarTelefone(telefone), // Se coletar telefone
         });
       }
-// --- FIM DA MODIFICAÇÃO PARA META PIXEL --- 
+            // Enviar evento para o backend CAPI (servidor)
+      fetch(`https://capi.respondipravoce.com.br/track-purchase`, { // <-- ATENÇÃO: Use o subdomínio HTTPS que você configurou no Caddy
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          eventId: eventId, // O mesmo event_id para deduplicação
+          value: calcularTotal( ),
+          currency: "BRL",
+          items: itensCarrinho.map(item => ({
+            id: item.produto.id.toString(),
+            quantity: item.quantidade,
+            item_price: item.produto.price,
+          })),
+          customer_info: {
+            primeiro_nome: primeiroNome, // Estes dados serão hashed no backend
+            ultimo_nome: ultimoNome,
+            telefone: formatarTelefone(telefone),
+            endereco: retiradaNaLoja ? "Retirar na loja" : endereco,
+            complemento: complemento,
+            forma_pagamento: formaPagamento,
+            tipo_entrega: retiradaNaLoja ? "retirada" : "entrega",
+            // Adicione outros dados do cliente que você queira enviar para o CAPI, como email
+            // email: "email_do_cliente@exemplo.com", // Exemplo: se você coletar email
+          },
+        }),
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => console.log("Resposta do backend CAPI:", data))
+      .catch(error => console.error("Erro ao enviar para o backend CAPI:", error));
+
+      // --- FIM DA MODIFICAÇÃO PARA META PIXEL --- 
     }
 
     // --- INÍCIO DA MODIFICAÇÃO PARA ATRASO DE REDIRECIONAMENTO --- 
