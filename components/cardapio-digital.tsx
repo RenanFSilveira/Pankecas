@@ -361,13 +361,13 @@ export function CardapioDigital() {
         ref={categoriasRef}
         className="sticky top-[72px] z-40 bg-[#FFF8E1] py-4 px-2 overflow-x-auto flex justify-start md:justify-center gap-2 shadow-md h-[56px] items-center"
       >
-        <div className="flex gap-2 font-[\'WinkyRough\']">
+        <div className="flex gap-2 font-['WinkyRough']">
           {categoriesList.map((categoriaLoop) => (
             <Button
               key={categoriaLoop}
               variant="outline"
               className={cn(
-                "whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium font-[\'WinkyRough\']",
+                "whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium font-['WinkyRough']",
                 (categoriaAtiva !== "todos" && categoriaAtiva === categoriaLoop) ||
                 (categoriaAtiva === "todos" && categoriaDestacadaMenu === categoriaLoop && categoriaLoop !== "todos")
                   ? "bg-[#8B4513] text-white hover:bg-[#6B3100]"
@@ -404,5 +404,88 @@ export function CardapioDigital() {
                   <div
                     key={categoryKey}
                     ref={(el) => { secoesCategoriasVisiveisEmTodos.current[categoryKey] = el; }}
-                  
-(Content truncated due to size limit. Use line ranges to read in chunks)
+                    data-categoria-scroll={categoryKey} 
+                    className="mb-12 pt-2" 
+                    id={`section-todos-${categoryKey}`}
+                  >
+                    <h2
+                      className="text-3xl font-['BabyKruffy'] text-[#8B4513] mb-6 py-3 sticky top-[128px] bg-[#FFF8E1] z-30 text-center md:text-left"
+                    >
+                      {categoryNames[categoryKey]}
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {itemsInCategory.map((produto) => (
+                        <Card key={produto.id} className="overflow-hidden flex flex-col h-full">
+                          <div className="aspect-video w-full overflow-hidden">
+                            <Image
+                              src={produto.image || "/placeholder.svg"}
+                              alt={produto.name}
+                              width={400}
+                              height={300}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="p-4 flex flex-col flex-1">
+                            <h2 className="text-xl font-bold text-[#8B4513] mb-2">{produto.name}</h2>
+                            <p className="text-sm text-gray-600 mb-4 flex-1">{produto.description}</p>
+                            <div className="flex justify-between items-center mt-auto">
+                              <span className="text-lg font-bold text-[#8B4513]">R$ {produto.price.toFixed(2)}</span>
+                              <Button onClick={() => adicionarAoCarrinho(produto)} className="bg-[#8B4513] text-white hover:bg-[#6B3100]">
+                                Adicionar
+                              </Button>
+                            </div>
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
+        )}
+
+        {categoriaAtiva !== "todos" && (
+          <div
+            ref={(el) => { secoesCategorias.current[categoriaAtiva] = el; }}
+            className="mb-12 pt-2"
+          >
+            <h2 className="text-3xl font-bold text-[#8B4513] mb-6 py-3 sticky top-[128px] bg-[#FFF8E1] z-30 text-center md:text-left">
+              {categoryNames[categoriaAtiva]}
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {produtosFiltrados.map((produto) => (
+                <Card key={produto.id} className="overflow-hidden flex flex-col h-full">
+                  <div className="aspect-video w-full overflow-hidden">
+                            <Image
+                              src={produto.image || "/placeholder.svg"}
+                              alt={produto.name}
+                              width={400}
+                              height={300}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="p-4 flex flex-col flex-1">
+                            <h2 className="text-xl font-bold text-[#8B4513] mb-2">{produto.name}</h2>
+                            <p className="text-sm text-gray-600 mb-4 flex-1">{produto.description}</p>
+                            <div className="flex justify-between items-center mt-auto">
+                              <span className="text-lg font-bold text-[#8B4513]">R$ {produto.price.toFixed(2)}</span>
+                              <Button onClick={() => adicionarAoCarrinho(produto)} className="bg-[#8B4513] text-white hover:bg-[#6B3100]">
+                                Adicionar
+                              </Button>
+                            </div>
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+
