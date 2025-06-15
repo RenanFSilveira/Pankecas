@@ -13,10 +13,11 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
 import { menuData, categoryNames, categoriesList, type MenuItem } from "@/lib/menu-data"
 
-// Declaração de tipos para GTM/GA4
+// Declaração de tipos para GTM/GA4 e Meta Pixel
 declare global {
   interface Window {
     dataLayer: any[];
+    fbq?: (command: string, eventName: string, parameters?: Record<string, any>) => void;
   }
 }
 
@@ -191,31 +192,38 @@ export function CardapioDigital() {
           tipo_entrega: retiradaNaLoja ? "retirada" : "entrega",
         },
       });
+
+      // --- INÍCIO DA MODIFICAÇÃO PARA META PIXEL --- 
+      // Dispara o evento de compra para o Meta Pixel
+      if (window.fbq) {
+        window.fbq('track', 'Purchase', {
+          value: calcularTotal(),
+          currency: 'BRL',
+          content_type: 'product_group', 
+          contents: itensCarrinho.map(item => ({
+            id: item.produto.id.toString(),
+            quantity: item.quantidade,
+            item_price: item.produto.price,
+          })),
+          // Você pode adicionar outros parâmetros do customer_info aqui se desejar
+          // Ex: external_id: transactionId, // Para deduplicação se usar CAPI
+          // email: 'email_do_cliente@exemplo.com', // Se coletar email
+          // phone_number: formatarTelefone(telefone), // Se coletar telefone
+        });
+      }
+      // --- FIM DA MODIFICAÇÃO PARA META PIXEL --- 
     }
 
-    let mensagem = `*Novo Pedido - Pankeca's*\n\n`
-    mensagem += `*Cliente:* ${nome}\n`
-    mensagem += `*Telefone:* ${telefone}\n`
-    if (retiradaNaLoja) {
-      mensagem += `*Retirada:* Na loja\n`
-    } else {
-      mensagem += `*Endereço:* ${endereco}\n`
-      if (complemento) {
-        mensagem += `*Complemento:* ${complemento}\n`
-      }
-    }
-    mensagem += `*Forma de Pagamento:* ${
-      formaPagamento === "dinheiro" ? "Dinheiro" : formaPagamento === "pix" ? "PIX" : "Cartão de Crédito/Débito"
-    }\n\n`
-    mensagem += `*Itens do Pedido:*\n`
-    itensCarrinho.forEach((item) => {
-      mensagem += `- ${item.quantidade}x ${item.produto.name} (R$ ${(item.produto.price * item.quantidade).toFixed(2)})\n`
-    })
-    mensagem += `\n*Total:* R$ ${calcularTotal().toFixed(2)}`
-    const mensagemCodificada = encodeURIComponent(mensagem)
+    // --- INÍCIO DA MODIFICAÇÃO PARA ATRASO DE REDIRECIONAMENTO --- 
+    const mensagemCodificada = encodeURIComponent(`*Novo Pedido - Pankeca's*\n\n*Cliente:* ${nome}\n*Telefone:* ${telefone}\n${retiradaNaLoja ? '*Retirada:* Na loja\n' : `*Endereço:* ${endereco}\n${complemento ? `*Complemento:* ${complemento}\n` : ''}`}*Forma de Pagamento:* ${formaPagamento === "dinheiro" ? "Dinheiro" : formaPagamento === "pix" ? "PIX" : "Cartão de Crédito/Débito"}\n\n*Itens do Pedido:*\n${itensCarrinho.map(item => `- ${item.quantidade}x ${item.produto.name} (R$ ${(item.produto.price * item.quantidade).toFixed(2)})`).join('\n')}\n\n*Total:* R$ ${calcularTotal().toFixed(2)}`);
     const numeroWhatsApp = "5527999999154"
     const urlWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${mensagemCodificada}`
-    window.open(urlWhatsApp, "_blank")
+
+    // Atrasar o redirecionamento para garantir que o evento do Pixel seja enviado
+    setTimeout(() => {
+      window.open(urlWhatsApp, "_blank")
+    }, 800); // Atraso de 800 milissegundos
+    // --- FIM DA MODIFICAÇÃO PARA ATRASO DE REDIRECIONAMENTO --- 
 
     // Opcional: Limpar carrinho após envio
     // setItensCarrinho([])
