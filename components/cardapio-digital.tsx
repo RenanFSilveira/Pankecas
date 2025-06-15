@@ -182,7 +182,6 @@ export function CardapioDigital() {
             price: item.produto.price,
             quantity: item.quantidade,
           })),
-          event_id: eventId,
         },
         customer_info: {
           primeiro_nome: primeiroNome,
